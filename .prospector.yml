@@ -35,6 +35,7 @@ pycodestyle:
     - W291 # Disable trailing whitespaces for comments, since they use Markdown.
     - E306 # Don't like it.
     - N803 # Matrices variable names can be uppercase.
+    - N806 # Matrices variable names can be uppercase.
 
 mccabe:
   options:
