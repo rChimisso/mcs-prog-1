@@ -1,6 +1,6 @@
+from typing import Any
 import scipy.io
 import numpy as np
-from typing import Any
 from solvers import JacobiSolver, GaussSeidelSolver, GradientDescentSolver, ConjugateGradientSolver
 
 VERSION = "0.0.1"
@@ -8,7 +8,7 @@ VERSION = "0.0.1"
 def main():
   print(f"MatIter iterative solver engine v{VERSION}\n")
 
-  with open("./data/vem1.mtx") as mtx:
+  with open("./data/vem1.mtx", encoding="ascii") as mtx:
     A: np.typing.NDArray[Any] = scipy.io.mmread(mtx).toarray()
     x = np.ones(A.shape[1])
     b = A @ x

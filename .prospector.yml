@@ -20,6 +20,7 @@ pylint:
     - R0902 # Classes are allowed to have as many instance attributes as needed.
     - R0903 # Classes are allowed to have less than 2 public methods.
     - R0917 # Don't really care about distinction from arguments and named arguments in the count of total arguments.
+    - C0103 # Matrices variable names can be uppercase.
 
 pycodestyle:
   disable:
@@ -33,6 +34,7 @@ pycodestyle:
     - E701 # Sometimes rasing an exception in the same line is more readable.
     - W291 # Disable trailing whitespaces for comments, since they use Markdown.
     - E306 # Don't like it.
+    - N803 # Matrices variable names can be uppercase.
 
 mccabe:
   options:

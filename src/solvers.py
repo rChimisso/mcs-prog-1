@@ -1,9 +1,9 @@
 import time
-import numpy as np
-from tqdm import tqdm
 from typing import Any, Optional
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
+import numpy as np
+from tqdm import tqdm
 
 @dataclass
 class Info:
