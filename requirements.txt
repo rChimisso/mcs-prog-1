@@ -1,0 +1,5 @@
+numpy
+pytest
+prospector
+sphinx
+pyinstaller==6.11.1

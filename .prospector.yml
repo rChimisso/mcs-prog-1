@@ -1,0 +1,39 @@
+output-format: grouped
+
+strictness: veryhigh
+
+pylint:
+  options:
+    indent-string: '  '
+    indent-after-paren: 2
+    max-line-length: 255
+    max-statements: 100
+    max-nested-blocks: 6
+    max-bool-expr: 8
+    max-locals: 20
+    max-complexity: 16
+    max-branches: 16
+    max-args: 10
+  disable:
+    - C0330 # Avoid "bad-continuation" warnings that might be affected by 2-spaces indentation.
+    - C0321 # Sometimes rasing an exception in the same line is more readable.
+    - R0902 # Classes are allowed to have as many instance attributes as needed.
+    - R0903 # Classes are allowed to have less than 2 public methods.
+    - R0917 # Don't really care about distinction from arguments and named arguments in the count of total arguments.
+
+pycodestyle:
+  disable:
+    - E111 # Indentation is not a multiple of 4.
+    - E114 # Indentation is not a multiple of 4 (for comments).
+    - E121 # Continuation line under-indented for hanging indent.
+    - E261 # Inline comments are fine with a single space.
+    - E302 # No need for two blank lines between classes.
+    - E305 # No need for two blank lines between functions.
+    - E501 # Line length is already checked by Pylint.
+    - E701 # Sometimes rasing an exception in the same line is more readable.
+    - W291 # Disable trailing whitespaces for comments, since they use Markdown.
+    - E306 # Don't like it.
+
+mccabe:
+  options:
+    max-complexity: 15
