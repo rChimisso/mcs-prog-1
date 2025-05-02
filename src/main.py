@@ -1,9 +1,9 @@
-from typing import Any
+from typing import Any, Final
 import scipy.io
 import numpy as np
 from solvers import JacobiSolver, GaussSeidelSolver, GradientDescentSolver, ConjugateGradientSolver
 
-VERSION = "0.0.1"
+VERSION: Final[str] = "0.0.1"
 
 def main():
   print(f"MatIter iterative solver engine v{VERSION}\n")
