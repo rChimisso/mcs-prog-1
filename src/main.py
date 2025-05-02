@@ -1,4 +1,4 @@
-from typing import Any, Final
+from typing import Any, Final, cast
 import scipy.io
 import numpy as np
 from solvers import JacobiSolver, GaussSeidelSolver, GradientDescentSolver, ConjugateGradientSolver
@@ -9,7 +9,7 @@ def main():
   print(f"MatIter iterative solver engine v{VERSION}\n")
 
   with open("./data/vem1.mtx", encoding="ascii") as mtx:
-    A: np.typing.NDArray[Any] = scipy.io.mmread(mtx).toarray()
+    A: np.typing.NDArray[Any] = cast(np.typing.NDArray[Any], scipy.io.mmread(mtx).toarray())
     x = np.ones(A.shape[1])
     b = A @ x
 
