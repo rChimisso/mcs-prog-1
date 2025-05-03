@@ -190,11 +190,7 @@ class ConjugateGradientSolver(IterativeSolver):
       if self._residual(A, b, x) < tol:
         return x, k + 1, True
       rs_new = r @ r
-      try:
-        beta = rs_new / rs_old
-      except:
-        print(rs_new, rs_old)
-        beta = 0
+      beta = rs_new / rs_old
       p = r + beta * p
       rs_old = rs_new
     return x, max_iter, False
