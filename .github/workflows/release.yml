@@ -65,7 +65,7 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: Build Release Artifact
-        run: pyinstaller src/main.py --name MatIterEngine --noconsole --onefile
+        run: pyinstaller src/main.py --name MatIterEngine --onefile
 
       - name: Create Release Body
         id: release_body
@@ -101,7 +101,7 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: Build Release Artifact
-        run: pyinstaller src/main.py --name MatIterEngine --noconsole --onefile
+        run: pyinstaller src/main.py --name MatIterEngine --onefile
 
       - name: Add to Release
         uses: softprops/action-gh-release@v2

@@ -107,10 +107,10 @@ class JacobiSolver(IterativeSolver):
   """
   Jacobi solver.
 
-  Uses Jacobi's method to iteratively solve a SPD system.  
-  Splits **A** into its diagonal **D** and remainder **R = A - D**.  
-  Starting from an initial guess *x⁰*, each forward sweep computes *xᵏ⁺¹ ← D⁻¹(b - R xᵏ)*, so every component is updated simultaneously using only the values from the previous iteration.  
-  Jacobi converges when the iteration matrix *D⁻¹R* has spectral radius *< 1* (e.g., for strictly diagonally-dominant or suitably scaled SPD systems).
+  | Uses Jacobi's method to iteratively solve a SPD system.
+  | Splits **A** into its diagonal **D** and remainder **R = A - D**.
+  | Starting from an initial guess *x⁰*, each forward sweep computes *xᵏ⁺¹ ← D⁻¹(b - R xᵏ)*, so every component is updated simultaneously using only the values from the previous iteration.
+  | Jacobi converges when the iteration matrix *D⁻¹R* has spectral radius *< 1* (e.g., for strictly diagonally-dominant or suitably scaled SPD systems.
   """
   def _solve(self, A: np.typing.NDArray[np.float64], b: np.typing.NDArray[np.float64], x0: np.typing.NDArray[np.float64], tol: float, max_iter: int) -> tuple[np.typing.NDArray[np.float64], int, bool]:
     x = x0
@@ -126,10 +126,10 @@ class GaussSeidelSolver(IterativeSolver):
   """
   Gauss-Seidel solver.
 
-  Uses Gauss-Seidel's method to iteratively solve a SPD system.  
-  Splits **A** into its diagonal **D**, strictly lower **L**, and strictly upper **U**.  
-  Each forward sweep updates entries in-place: *for i = 0,…,n-1: xᵢ ← (bᵢ - Lᵢx - Uᵢx) / Dᵢ*.  
-  Gauss-Seidel is guaranteed to converge for np.float64 SPD matrix eventually.
+  | Uses Gauss-Seidel's method to iteratively solve a SPD system.
+  | Splits **A** into its diagonal **D**, strictly lower **L**, and strictly upper **U**.
+  | Each forward sweep updates entries in-place: *for i = 0,…,n-1: xᵢ ← (bᵢ - Lᵢx - Uᵢx) / Dᵢ*.
+  | Gauss-Seidel is guaranteed to converge for np.float64 SPD matrix eventually.
   """
   def _solve(self, A: np.typing.NDArray[np.float64], b: np.typing.NDArray[np.float64], x0: np.typing.NDArray[np.float64], tol: float, max_iter: int) -> tuple[np.typing.NDArray[np.float64], int, bool]:
     x, n = x0, b.size
@@ -145,12 +145,12 @@ class GradientDescentSolver(IterativeSolver):
   """
   Gradient Descent solver.
 
-  Uses the Gradient Descent method to iteratively solve a SPD system.  
-  Minimises the quadratic *½xᵀAx - bᵀx* for SPD **A** by moving along the negative gradient (residual) with an exact line-search each step:  
-  *rᵏ = b - A xᵏ*  
-  *αᵏ = (rᵏᵀ rᵏ) / (rᵏᵀ A rᵏ)*  
-  *xᵏ⁺¹ = xᵏ + αᵏ rᵏ*  
-  Converges for every SPD system, with rate governed by the condition number *κ(A)*.
+  | Uses the Gradient Descent method to iteratively solve a SPD system.
+  | Minimises the quadratic *½xᵀAx - bᵀx* for SPD **A** by moving along the negative gradient (residual) with an exact line-search each step:
+  | *rᵏ = b - A xᵏ*
+  | *αᵏ = (rᵏᵀ rᵏ) / (rᵏᵀ A rᵏ)*
+  | *xᵏ⁺¹ = xᵏ + αᵏ rᵏ*
+  | Converges for every SPD system, with rate governed by the condition number *κ(A)*.
   """
   def _solve(self, A: np.typing.NDArray[np.float64], b: np.typing.NDArray[np.float64], x0: np.typing.NDArray[np.float64], tol: float, max_iter: int) -> tuple[np.typing.NDArray[np.float64], int, bool]:
     x, r = x0, b - A @ x0
@@ -169,15 +169,15 @@ class ConjugateGradientSolver(IterativeSolver):
   """
   Conjugate Gradient solver.
 
-  Uses Conjugate Descent method to iteratively solve a SPD system.  
-  Krylov-subspace method tailored to SPD systems; builds mutually **A-conjugate** search directions to minimise the A-norm of the error.  
-  Starting with *r⁰ = b - A x⁰* and *p⁰ = r⁰*, repeat:  
-  *αᵏ = (rᵏᵀ rᵏ) / (pᵏᵀ A pᵏ)*  
-  *xᵏ⁺¹ = xᵏ + αᵏ pᵏ*  
-  *rᵏ⁺¹ = rᵏ - αᵏ A pᵏ*  
-  *βᵏ = (rᵏ⁺¹ᵀ rᵏ⁺¹) / (rᵏᵀ rᵏ)*  
-  *pᵏ⁺¹ = rᵏ⁺¹ + βᵏ pᵏ*  
-  Converges in *≤ n* steps in exact arithmetic and typically in *O(√κ(A))* iterations.
+  | Uses Conjugate Descent method to iteratively solve a SPD system.
+  | Krylov-subspace method tailored to SPD systems; builds mutually **A-conjugate** search directions to minimise the A-norm of the error.
+  | Starting with *r⁰ = b - A x⁰* and *p⁰ = r⁰*, repeat:
+  | *αᵏ = (rᵏᵀ rᵏ) / (pᵏᵀ A pᵏ)*
+  | *xᵏ⁺¹ = xᵏ + αᵏ pᵏ*
+  | *rᵏ⁺¹ = rᵏ - αᵏ A pᵏ*
+  | *βᵏ = (rᵏ⁺¹ᵀ rᵏ⁺¹) / (rᵏᵀ rᵏ)*
+  | *pᵏ⁺¹ = rᵏ⁺¹ + βᵏ pᵏ*
+  | Converges in *≤ n* steps in exact arithmetic and typically in *O(√κ(A))* iterations.
   """
   def _solve(self, A: np.typing.NDArray[np.float64], b: np.typing.NDArray[np.float64], x0: np.typing.NDArray[np.float64], tol: float, max_iter: int) -> tuple[np.typing.NDArray[np.float64], int, bool]:
     x, r = x0, b - A @ x0
