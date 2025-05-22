@@ -74,7 +74,7 @@ def solve(solver: IterativeSolver, name: str, A: np.typing.NDArray[Any], b: np.t
 def main() -> None:
   """
   Main script.
-  
+
   Prints out the engine header and then solves the system specified by the input arguments with all available iterative solvers.
   """
   print(f"MatIterEngine v{VERSION} - Iterative solvers engine for SPD systems\n")
