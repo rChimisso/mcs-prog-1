@@ -19,7 +19,7 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].joinpath('src').resolve().a
 project = 'MatIter'
 copyright = '2025, Riccardo Chimisso & Mauro Zorzin'
 author = 'Riccardo Chimisso & Mauro Zorzin'
-release = '0.0.1'
+release = '1.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
