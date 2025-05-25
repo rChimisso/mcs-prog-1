@@ -8,7 +8,7 @@ import scipy.sparse # type: ignore
 import numpy as np
 from solvers import IterativeSolver, JacobiSolver, GaussSeidelSolver, GradientDescentSolver, ConjugateGradientSolver
 
-VERSION: Final[str] = "0.0.1"
+VERSION: Final[str] = "1.0.0"
 
 def validate_inputs(A: str, x: Optional[str], tol: float) -> list[str]:
   """
