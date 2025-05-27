@@ -25,7 +25,7 @@ def validate_inputs(A: Optional[str], x: Optional[str], tol: float) -> list[str]
   """
   errors: list[str] = []
   if A is None:
-    errors.append(f"Error: the following arguments are required: A.")
+    errors.append("Error: the following arguments are required: A.")
   if A is not None and not Path(A).is_file():
     errors.append(f"Error: file '{A}' does not exist.")
   if x is not None and not Path(x).is_file():

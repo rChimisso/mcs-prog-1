@@ -72,6 +72,8 @@ Quando viene effettuato un rilascio:
 5. Eseguibili per Linux e Windows vengono generati e una nuova release viene creata.
 6. Viene costruita la documentazione aggiornata tramite Sphinx e viene pubblicata con GitHub Pages all'indirizzo https://rchimisso.github.io/mcs-prog-1/.
 
+I workflow di cui ai punti 2, 3 e 6 sono eseguibili anche in modo indipendente.
+
 ## Risultati
 
 TODO
