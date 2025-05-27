@@ -10,7 +10,7 @@ from solvers import IterativeSolver, JacobiSolver, GaussSeidelSolver, GradientDe
 
 VERSION: Final[str] = "1.0.0"
 
-def validate_inputs(A: str, x: Optional[str], tol: float) -> list[str]:
+def validate_inputs(A: Optional[str], x: Optional[str], tol: float) -> list[str]:
   """
   Validates the script inputs.
 
@@ -24,7 +24,9 @@ def validate_inputs(A: str, x: Optional[str], tol: float) -> list[str]:
   :rtype: list[str]
   """
   errors: list[str] = []
-  if not Path(A).is_file():
+  if A is None:
+    errors.append(f"Error: the following arguments are required: A.")
+  if A is not None and not Path(A).is_file():
     errors.append(f"Error: file '{A}' does not exist.")
   if x is not None and not Path(x).is_file():
     errors.append(f"Error: file '{x}' does not exist.")
@@ -83,7 +85,7 @@ def main() -> None:
     prog="MatIterEngine",
     description="Compares four different iterative solvers (Jacobi, Gauss-Seidel, Gradient Descent, Conjugate Gradient) in solving the SPD system defined by Ax = b."
   )
-  parser.add_argument("A", type=str, metavar="A", help="Path to the .mtx file for the A matrix.")
+  parser.add_argument("A", type=str, metavar="A", nargs="?", default=None, help="Path to the .mtx file for the A matrix.")
   parser.add_argument("-A", "--A", "-matrix", "--matrix", dest="A_pos", type=str, help="Named form of the A-matrix argument. Overrides the positional A if both are given.")
   parser.add_argument("x", type=str, metavar="x", nargs="?", default=None, help="Path to the .mtx file for the exact solution vector x; default [1., ..., 1.].")
   parser.add_argument("-x", "--x", "-sol", "--sol", dest="x_pos", type=str, default=None, help="Named form of the solution vector x; overrides the positional x if both are given.")
