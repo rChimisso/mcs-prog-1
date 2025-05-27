@@ -67,20 +67,98 @@ This will create an executable for your platform.
 
 ## Solvers
 
-This project provides 4 different iterative solvers.
+This project provides 4 iterative solvers for Symmetric Positive Definite (SPD) linear systems.
+
+> **What “SPD” means**
+> A matrix is *symmetric positive definite* (SPD) when it equals its transpose and all its eigen‑values are positive. In that case every quadratic form $x^T A x$ is strictly positive unless $x=0$.
+
+---
 
 ### Jacobi Solver
 
-TODO
+#### How it updates the guess
 
-### Gauss-Seidel Solver
+Split $A$ into its diagonal part $P$ and everything else $N$ so that $A = P − N$.  Because $P$ is diagonal its inverse is just the reciprocals of those diagonal numbers.  
+One step is
 
-TODO
+$x^{k+1} = P^{-1}(N x^{k} + b)$
+
+#### Why/when it converges
+
+If every row has a *strictly dominating* diagonal entry – that is, $|a_{ii}|$ is larger than the sum of the other absolute values in that row – Jacobi certainly converges.  
+Many SPD matrices meet (or can be scaled to meet) this requirement, so in practice Jacobi often works for SPD systems.
+
+#### Work per step
+
+One matrix–vector product plus a few vector operations → about $O(n^2)$ operations for a dense matrix.
+
+---
+
+### Gauss–Seidel Solver
+
+#### How it differs from Jacobi
+
+Here $P$ is the lower‑triangular part of $A$ (diagonal included).  
+Instead of forming $P^{-1}$ we solve the triangular system $P y = r$ with forward substitution, then set $x^{k+1}=x^{k}+y$.
+
+#### Why/when it converges
+
+The same strict diagonal dominance guarantees convergence.  
+A popular variant called SOR adds a relaxation factor $\omega$; for SPD matrices it converges as long as $0 < \omega < 2$.
+
+#### Work per step
+
+Still dominated by one matrix–vector product, so again $O(n^2)$ for dense $A$, but usually needs fewer sweeps than Jacobi.
+
+---
 
 ### Gradient Descent Solver
 
-TODO
+#### Geometric picture
+
+Solving $A x = b$ is the same as minimising the quadratic
+
+$\varphi(x)=\tfrac12 x^T A x - b^T x$
+
+With $x^k$ we take the steepest downhill direction $r^k=b – A x^k$ and an exact step length
+
+$\alpha^{k}=\frac{r^{k\,T}r^{k}}{r^{k\,T}A r^{k}}$
+
+#### Why/when it converges
+
+Because $A$ is SPD, $\phi$ is a bowl‑shaped surface with one unique bottom point, so the iterations always reach the solution.  
+The path, however, can *zig‑zag* when $A$’s eigen‑values are far apart.
+
+#### Work per step
+
+One matrix–vector product + a few dot products → $O(n^2)$ for dense $A$.
+
+---
 
 ### Conjugate Gradient Solver
 
-TODO
+#### Key idea
+
+CG keeps the same energy function $\phi$ but chooses each search direction $p^k$ so that it is *A‑conjugate* to all previous ones ($p^{i\,T}A p^{j}=0$ if i≠j).  
+With this choice the exact solution is obtained in at most $n$ steps in exact arithmetic.
+
+A compact version of the update is:
+
+1. $α^k = \frac{r^k·r^k}{p^k·A p^k}$
+
+2. $x^{k+1} = x^k + α^kp^k$
+
+3. $r^{k+1} = r^k − α^kA p^k$
+
+4. $β^k = \frac{r^{k+1}·r^{k+1}}{r^k·r^k}$
+
+5. $p^{k+1} = r^{k+1} + β^kp^k$
+
+#### Why/when it converges
+
+CG needs $A$ to be SPD.  
+In floating‑point arithmetic it usually reaches machine precision in roughly $\sqrt{κ(A)}$ iterations, far faster than plain Gradient Descent.
+
+#### Work per step
+
+One matrix–vector product plus a fixed number of vector operations, again about $O(n^2)$ for dense $A$ but with many fewer iterations overall.
