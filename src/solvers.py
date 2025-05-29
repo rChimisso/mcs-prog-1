@@ -109,8 +109,8 @@ class JacobiSolver(IterativeSolver):
 
   | Uses Jacobi's method to iteratively solve a SPD system.
   | Splits **A** into its diagonal **D** and remainder **R = A - D**.
-  | Starting from an initial guess *x⁰*, each forward sweep computes *xᵏ⁺¹ ← D⁻¹(b - R xᵏ)*, so every component is updated simultaneously using only the values from the previous iteration.
-  | Jacobi converges when the iteration matrix *D⁻¹R* has spectral radius *< 1* (e.g., for strictly diagonally-dominant or suitably scaled SPD systems.
+  | Starting from an initial guess *x⁰*, each forward sweep computes *xᵏ⁺¹ ← D⁻¹(b - Rxᵏ)*, so every component is updated simultaneously using only the values from the previous iteration.
+  | Jacobi converges when the iteration matrix *D⁻¹R* has spectral radius *< 1* (e.g., for strictly diagonally-dominant or suitably scaled SPD systems).
   """
   def _solve(self, A: np.typing.NDArray[np.float64], b: np.typing.NDArray[np.float64], x0: np.typing.NDArray[np.float64], tol: float, max_iter: int) -> tuple[np.typing.NDArray[np.float64], int, bool]:
     x = x0
@@ -129,7 +129,7 @@ class GaussSeidelSolver(IterativeSolver):
   | Uses Gauss-Seidel's method to iteratively solve a SPD system.
   | Splits **A** into its diagonal **D**, strictly lower **L**, and strictly upper **U**.
   | Each forward sweep updates entries in-place: *for i = 0,…,n-1: xᵢ ← (bᵢ - Lᵢx - Uᵢx) / Dᵢ*.
-  | Gauss-Seidel is guaranteed to converge for np.float64 SPD matrix eventually.
+  | Gauss-Seidel is guaranteed to converge for SPD matrix eventually.
   """
   def _solve(self, A: np.typing.NDArray[np.float64], b: np.typing.NDArray[np.float64], x0: np.typing.NDArray[np.float64], tol: float, max_iter: int) -> tuple[np.typing.NDArray[np.float64], int, bool]:
     x, n = x0, b.size
@@ -170,7 +170,7 @@ class ConjugateGradientSolver(IterativeSolver):
   Conjugate Gradient solver.
 
   | Uses Conjugate Descent method to iteratively solve a SPD system.
-  | Krylov-subspace method tailored to SPD systems; builds mutually **A-conjugate** search directions to minimise the A-norm of the error.
+  | Builds mutually **A-conjugate** search directions to minimise the A-norm of the error.
   | Starting with *r⁰ = b - A x⁰* and *p⁰ = r⁰*, repeat:
   | *αᵏ = (rᵏᵀ rᵏ) / (pᵏᵀ A pᵏ)*
   | *xᵏ⁺¹ = xᵏ + αᵏ pᵏ*

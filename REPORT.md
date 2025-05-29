@@ -2,6 +2,28 @@
 
 ##### *2025, Metodi del Calcolo Scientifico, Riccardo Chimisso 866009 & Mauro Zorzin 866001*
 
+## Indice
+
+1. [Struttura](#struttura)
+    1. [Codice](#codice)
+        1. [`solvers.py`](#solverspy)
+        2. [`main.py`](#mainpy)
+    2. [Dati](#dati)
+    3. [Test](#test)
+    4. [Documentazione](#documentazione)
+    5. [CI](#ci)
+2. [Risultati](#risultati)
+    1. [Tempo per iterazione](#tempo-per-iterazione)
+    2. [Grafici iterazioni impiegate](#grafici-iterazioni-impiegate)
+    3. [Grafici tempo per tolleranza](#grafici-tempo-per-tolleranza)
+3. [Conclusioni](#conclusioni)
+  1. [Informazioni sulle matrici](#informazioni-sulle-matrici)
+  2. [Commenti](#commenti)
+4. [Sviluppi futuri](#sviluppi-futuri)
+5. [Appendice](#appendice)
+    1. [Dati grezzi](#dati-grezzi)
+    2. [Dati tabellari](#dati-tabellari)
+
 ## Struttura
 
 *La struttura di questa libreria è molto semplice e descritta di seguito.*  
@@ -22,7 +44,8 @@ Grazie alla classe astratta, ciascun risolutore può essere inizializzato con va
 
 Il metodo `solve` richiede di passare la matrice $A$ e il vettore $b$.  
 Opzionalmente è possibile specificare una soluzione di partenza $x_0$ diversa dal vettore con tutti $0$, così come una tolleranza o un numero massimo di iterazioni diversi da quelli di base del risolutore.  
-Il risultato restituito è una tupla con la soluzione approssimata trovata e i dati raccolti sull'esecuzione.
+Il risultato restituito è una tupla con la soluzione approssimata trovata e i dati raccolti sull'esecuzione.  
+Il metodo si arresta quando raggiunge il numero massimo di iterazioni consentite oppure ottiene una soluzione il cui errore residuo $\frac{|| Ax - b ||}{|| b ||}$ è inferiore alla tolleranza specificata.
 
 I 4 risolutori disponibili sono classi concrete che ereditano da `IterativeSolver`: `JacobiSolver`, `GaussSeidelSolver`, `GradientDescentSolver` e `ConjugateGradientSolver`.  
 Ciascun risolutore ha nel nome l'algoritmo risolutivo che implementa.
@@ -77,11 +100,20 @@ I workflow di cui ai punti 2, 3 e 6 sono eseguibili anche in modo indipendente.
 ## Risultati
 
 Sono stati fatti $16$ esperimenti per ogni combinazione di matrici di test (`spa1.mtx`, `spa2.mtx`, `vem1.mtx`, `vem2.mtx`) e tolleranza ($1\mathrm{e}{-4}$, $1\mathrm{e}{-6}$, $1\mathrm{e}{-8}$, $1\mathrm{e}{-10}$).  
-Ogni esperimento è stato eseguito $5$ volte e di seguito sono riportati i risultati migliori, in quanto le misure possono essere affette da altri programmi che girano sulla stessa macchina, e quindi il tempo più accurato è il migliore anziché la media.
+Il numero massimo di iterazioni è stato impostato a $20000$.  
+Ogni esperimento è stato eseguito $5$ volte e di seguito sono riportati i risultati migliori, in quanto le misure possono essere affette da altri programmi che girano sulla stessa macchina, e quindi il tempo più accurato è il più basso (anziché la media).
+
+Tutti gli esperimenti sono stati eseguiti sul medesimo computer con le seguenti specifiche:
+
+- CPU: 12th Gen Intel(R) Core(TM) i7-12700H 2.30 GHz
+- RAM: 64 GB
+- Archiviazione: 1 TB SSD Samsung SSD 980 PRO 1TB
+- GPU: NVIDIA GeForce RTX 3070 Ti Laptop GPU (8 GB)
+- OS: Windows 10 Home 22H2 (build 19045.5854)
 
 ### Tempo per iterazione
 
-Per ciascuna coppia matrice-risolutore è riportato il tempo impiegato per ciascuna iterazione.
+Per ciascuna coppia matrice-risolutore è riportato il tempo in secondi impiegato per ciascuna iterazione.
 
 |        | Jacobi              | Gauss-Seidel        | Gradient Descent  | Conjugate Gradient |
 |--------|:-------------------:|:-------------------:|:-----------------:|:------------------:|
@@ -90,68 +122,59 @@ Per ciascuna coppia matrice-risolutore è riportato il tempo impiegato per ciasc
 | `vem1` | $1\mathrm{e}{-3}$   | $8\mathrm{e}{-3}$   | $8\mathrm{e}{-4}$ | $8\mathrm{e}{-4}$  |
 | `vem2` | $2.5\mathrm{e}{-3}$ | $1.4\mathrm{e}{-2}$ | $2\mathrm{e}{-3}$ | $2\mathrm{e}{-3}$  |
 
-### Iterazioni impiegate
+### Grafici iterazioni impiegate
 
-Per ogni matrice, sono riportate tabelle che mostrano il numero di iterazioni impiegate per arrivare alla soluzione approssimata con una certa tolleranza.
-
-#### `spa1`
-
-|                    | Jacobi | Gauss-Seidel | Gradient Descent | Conjugate Gradient |
-|--------------------|-------:|-------------:|-----------------:|-------------------:|
-| $1\mathrm{e}{-4}$  | $115$  | $9$          | $143$            | $49$               |
-| $1\mathrm{e}{-6}$  | $181$  | $17$         | $3577$           | $134$              |
-| $1\mathrm{e}{-8}$  | $247$  | $24$         | $8233$           | $177$              |
-| $1\mathrm{e}{-10}$ | $313$  | $31$         | $12919$          | $200$              |
-
-#### `spa2`
-
-|                    | Jacobi | Gauss-Seidel | Gradient Descent | Conjugate Gradient |
-|--------------------|--------|--------------|------------------|--------------------|
-| $1\mathrm{e}{-4}$  | $36$   | $5$          | $161$            | $42$               |
-| $1\mathrm{e}{-6}$  | $57$   | $8$          | $1949$           | $122$              |
-| $1\mathrm{e}{-8}$  | $78$   | $12$         | $5087$           | $196$              |
-| $1\mathrm{e}{-10}$ | $99$   | $15$         | $8285$           | $240$              |
-
-#### `vem1`
-
-|                    | Jacobi | Gauss-Seidel | Gradient Descent | Conjugate Gradient |
-|--------------------|--------|--------------|------------------|--------------------|
-| $1\mathrm{e}{-4}$  | $1314$ | $659$        | $890$            | $38$               |
-| $1\mathrm{e}{-6}$  | $2433$ | $1218$       | $1612$           | $45$               |
-| $1\mathrm{e}{-8}$  | $3552$ | $1778$       | $2336$           | $53$               |
-| $1\mathrm{e}{-10}$ | $4671$ | $2338$       | $3058$           | $59$               |
-
-#### `vem2`
-
-|                    | Jacobi | Gauss-Seidel | Gradient Descent | Conjugate Gradient |
-|--------------------|--------|--------------|------------------|--------------------|
-| $1\mathrm{e}{-4}$  | $1927$ | $965$        | $1308$           | $47$               |
-| $1\mathrm{e}{-6}$  | $3676$ | $1840$       | $2438$           | $56$               |
-| $1\mathrm{e}{-8}$  | $5425$ | $2714$       | $3566$           | $66$               |
-| $1\mathrm{e}{-10}$ | $7174$ | $3589$       | $4696$           | $74$               |
-
-### Grafici tempo e iterazioni per tolleranza
-
-I grafici sotto riportati illustrano l'andamento di tempo e numero di iterazioni al variare di tolleranza e matrice.  
-I grafici sono in scala semilogaritmica (asse x) e le ascisse sono invertite di segno.
-
-#### Tempo
-
-![spa1-time](/assets/spa1-time.png)
-![spa2-time](/assets/spa2-time.png)
-![vem1-time](/assets/vem1-time.png)
-![vem2-time](/assets/vem2-time.png)
-
-#### Iterazioni
+I grafici sotto riportati illustrano, per ogni risolutore, il numero di iterazioni impiegate al variare del valore di tolleranza e matrice.
 
 ![spa1-iter](/assets/spa1-iter.png)
 ![spa2-iter](/assets/spa2-iter.png)
 ![vem1-iter](/assets/vem1-iter.png)
 ![vem2-iter](/assets/vem2-iter.png)
 
+### Grafici tempo per tolleranza
+
+I grafici sotto riportati illustrano, per ogni risolutore, l'andamento di tempo impiegato al variare di tolleranza e matrice.  
+I grafici sono in scala semilogaritmica (asse x) e le ascisse sono invertite di segno.
+
+![spa1-time](/assets/spa1-time.png)
+![spa2-time](/assets/spa2-time.png)
+![vem1-time](/assets/vem1-time.png)
+![vem2-time](/assets/vem2-time.png)
+
 ## Conclusioni
 
-TODO
+### Informazioni sulle matrici
+
+| Sigla  | n      | nnz         | Densità | Diagonalmente Dominante | $\lambda_{min}$ | $\lambda_{max}$ | κ           |
+| ------ | ------ | ----------- | ------- | :---------------------: | --------------: | --------------: | ----------: |
+| `spa1` | $1000$ | $≈1.8*10^5$ | $18\%$  | no                      | $≈0.488$        | $≈1000$         | $≈2*10^3$   |
+| `spa2` | $3000$ | $≈1.6*10^6$ | $18\%$  | no                      | $≈2.124$        | $≈3000$         | $≈1.5*10^3$ |
+| `vem1` | $1681$ | $≈1.3*10^4$ | $0.5\%$ | no                      | $≈0.012$        | $≈4$            | $≈3*10^2$   |
+| `vem2` | $2601$ | $≈2.1*10^4$ | $0.3\%$ | no                      | $≈0.008$        | $≈4$            | $≈5*10^2$   |
+
+*Nota:* $κ ≃ \frac{\lambda_{max}}{\lambda_{min}}$ *numero di condizionamento.*
+
+### Commenti
+
+Tutti i metodi arrivano a convergenza entro il limite di $20000$ iterazioni, tuttavia i risultati ottenuti evidenziano con chiarezza quanto la scelta dell'algoritmo di risoluzione incida sia sul tempo complessivo sia sul numero di iterazioni richieste.  
+L'analisi evidenzia anche che l'efficacia di ciascun metodo dipende fortemente dalla struttura e dal condizionamento del sistema lineare.
+
+Per matrici più dense e peggio condizionate (*spa1*, *spa2*), Gauss–Seidel (*GS*) primeggia nel contenimento del numero di iterazioni, seguito a breve distanza da Conjugate Gradient (*CG*) e da Jacobi (*J*), mentre Gradient Descent (GD) si conferma largamente inadeguato.  
+Sui sistemi più sparsi e meglio condizionati (*vem1*, *vem2*) la situazione si ribalta: *CG* diviene nettamente il più efficiente, con *GS* secondo, GD terzo e *J* relegato all'ultima posizione.
+
+In termini di tempo di esecuzione complessivo, GD risulta sempre il più lento; *GS*, pur garantendo un minor numero di iterazioni rispetto a *J*, paga un costo per iterazione più elevato e la natura intrinsecamente sequenziale lo rendono globalmente meno competitivo, infatti supera Jacobi solo in casi particolarmente gravosi (come *spa2*) dove la riduzione delle iterazioni compensa il maggior overhead.  
+*CG* rimane una scelta di gran lunga preferibile rispetto a GD, grazie al drastico risparmio di iterazioni a parità di costo per iterazione, nonché la più rapida in assoluto, salvo per *spa2* dove i metodi stazionari risultano competitivi.
+
+In conclusione, *GS* è indicato solo per matrici molto grandi e dense, *CG* rappresenta la soluzione ottimale nella maggior parte degli scenari, GD va evitato, mentre *J* resta utile principalmente in contesti didattici o fortemente parallelizzati, dove la semplicità implementativa e la possibilità di parallelismo possono compensare la lenta velocità di convergenza.
+
+## Sviluppi futuri
+
+Possibili direzioni di sviluppi futuri:
+
+- Permettere la scelta della precisione, ad esempio `float32` e `float16`. Attualmente tutte le computazioni girano in `float64`.
+- Integrare versioni GPU per testare il vantaggio di Jacobi su architetture massivamente parallele.
+- Permettere più esecuzioni senza dover rilanciare lo script.
+- Automatizzare l'analisi delle matrici in input, la creazione di grafici e l'esportazione dei dati.
 
 ## Appendice
 
@@ -454,7 +477,7 @@ Sotto sono riportati i dati per ciascun esperimento, sia in forma grezza che in 
 &emsp;Rel. error: $0.004968461406187168$  
 &emsp;Iterations: $1927$  
 &emsp;Iterations/s: $400.65$  
-&emsp;Time elapsed: $4.866523200063966 $s   
+&emsp;Time elapsed: $4.866523200063966$ s   
 **Gauss-Seidel Solver**  
 &emsp;Rel. error: $0.004951189291537078$  
 &emsp;Iterations: $965$  
@@ -545,69 +568,69 @@ Sotto sono riportati i dati per ciascun esperimento, sia in forma grezza che in 
 
 ### Dati tabellari
 
-| Matrice    | Tolleranza              | Risolutore         | Errore relativo                     | Iterazioni | Iterazioni al secondo | Tempo impiegato (s)    |
-|------------|:-----------------------:|--------------------|:------------------------------------|-----------:|----------------------:|-----------------------:|
-| `spa1.mtx` | $1\mathrm{e}{-4}$       | Jacobi             | $0.0017712811483052$                | $115$      | $3258.60$             | $0.0505786000285297$   |
-| `spa1.mtx` | $1\mathrm{e}{-4}$       | Gauss-Seidel       | $0.0182059429951886$                | $9$        | $195.05$              | $0.0500425000209361$   |
-| `spa1.mtx` | $1\mathrm{e}{-4}$       | Gradient Descent   | $0.0345747007730109$                | $143$      | $3302.22$             | $0.0463016000576317$   |
-| `spa1.mtx` | $1\mathrm{e}{-4}$       | Conjugate Gradient | $0.0207897600099567$                | $49$       | $3204.20$             | $0.0193742000265046$   |
-| `spa1.mtx` | $1\mathrm{e}{-6}$       | Jacobi             | $1.7979295435203664\mathrm{e}{-05}$ | $181$      | $3333.27$             | $0.0709855000022798$   |
-| `spa1.mtx` | $1\mathrm{e}{-6}$       | Gauss-Seidel       | $0.0001299693958593$                | $17$       | $219.13$              | $0.0832920999964699$   |
-| `spa1.mtx` | $1\mathrm{e}{-6}$       | Gradient Descent   | $0.000968045731061$                 | $3577$     | $3035.66$             | $1.1822739000199365$   |
-| `spa1.mtx` | $1\mathrm{e}{-6}$       | Conjugate Gradient | $2.5529092775890695\mathrm{e}{-05}$ | $134$      | $2463.03$             | $0.0589533000020310$   |
-| `spa1.mtx` | $1\mathrm{e}{-8}$       | Jacobi             | $1.824978857450717\mathrm{e}{-07}$  | $247$      | $3074.89$             | $0.0963087000418454$   |
-| `spa1.mtx` | $1\mathrm{e}{-8}$       | Gauss-Seidel       | $1.709732900192307\mathrm{e}{-06}$  | $24$       | $217.01$              | $0.1176029000198468$   |
-| `spa1.mtx` | $1\mathrm{e}{-8}$       | Gradient Descent   | $9.816363743987784\mathrm{e}{-06}$  | $8233$     | $3025.04$             | $2.7249416999984533$   |
-| `spa1.mtx` | $1\mathrm{e}{-8}$       | Conjugate Gradient | $1.3198404441969156\mathrm{e}{-07}$ | $177$      | $2885.35$             | $0.0659314999356865$   |
-| `spa1.mtx` | $1\mathrm{e}{-10}$      | Jacobi             | $1.8524352742197323\mathrm{e}{-09}$ | $313$      | $3056.20$             | $0.1173645000671967$   |
-| `spa1.mtx` | $1\mathrm{e}{-10}$      | Gauss-Seidel       | $2.248087991277066\mathrm{e}{-08}$  | $31$       | $222.37$              | $0.1450276999967172$   |
-| `spa1.mtx` | $1\mathrm{e}{-10}$      | Gradient Descent   | $9.82038624643504\mathrm{e}{-08}$   | $12919$    | $2853.14$             | $4.5308337000897150$   |
-| `spa1.mtx` | $1\mathrm{e}{-10}$      | Conjugate Gradient | $1.2031105079603335\mathrm{e}{-09}$ | $200$      | $2927.66$             | $0.0718103999970480$   |
-| `spa2.mtx` | $1\mathrm{e}{-4}$       | Jacobi             | $0.0017662465191142$                | $36$       | $296.47$              | $0.1938776999013498$   |
-| `spa2.mtx` | $1\mathrm{e}{-4}$       | Gauss-Seidel       | $0.0025988955874525$                | $5$        | $41.67$               | $0.1738186000147834$   |
-| `spa2.mtx` | $1\mathrm{e}{-4}$       | Gradient Descent   | $0.0181296451171122$                | $161$      | $272.11$              | $0.6105576999252662$   |
-| `spa2.mtx` | $1\mathrm{e}{-4}$       | Conjugate Gradient | $0.0098211284572642$                | $42$       | $327.98$              | $0.1609246999723836$   |
-| `spa2.mtx` | $1\mathrm{e}{-6}$       | Jacobi             | $1.6667561367165373\mathrm{e}{-05}$ | $57$       | $302.73$              | $0.2664870000444352$   |
-| `spa2.mtx` | $1\mathrm{e}{-6}$       | Gauss-Seidel       | $5.141641259558678\mathrm{e}{-05}$  | $8$        | $48.31$               | $0.2209601000649854$   |
-| `spa2.mtx` | $1\mathrm{e}{-6}$       | Gradient Descent   | $0.0006694229253854$                | $1949$     | $311.26$              | $6.2817090000025930$   |
-| `spa2.mtx` | $1\mathrm{e}{-6}$       | Conjugate Gradient | $0.0001197984617853$                | $122$      | $315.1$               | $0.4163732000160962$   |
-| `spa2.mtx` | $1\mathrm{e}{-8}$       | Jacobi             | $1.5728698925534617\mathrm{e}{-07}$ | $78$       | $315.70$              | $0.3353824999649077$   |
-| `spa2.mtx` | $1\mathrm{e}{-8}$       | Gauss-Seidel       | $2.7943220320511893\mathrm{e}{-07}$ | $12$       | $50.43$               | $0.2970233999658376$   |
-| `spa2.mtx` | $1\mathrm{e}{-8}$       | Gradient Descent   | $6.86524011651092\mathrm{e}{-06}$   | $5087$     | $324.11$              | $15.7146126999286920$  |
-| `spa2.mtx` | $1\mathrm{e}{-8}$       | Conjugate Gradient | $5.586660602468392\mathrm{e}{-07}$  | $196$      | $333.90$              | $0.6159428999526426$   |
-| `spa2.mtx` | $1\mathrm{e}{-10}$      | Jacobi             | $1.484272806877848\mathrm{e}{-09}$  | $99$       | $307.20$              | $0.4034111999208107$   |
-| `spa2.mtx` | $1\mathrm{e}{-10}$      | Gauss-Seidel       | $5.570739073407751\mathrm{e}{-09}$  | $15$       | $49.51$               | $0.3636420000111684$   |
-| `spa2.mtx` | $1\mathrm{e}{-10}$      | Gradient Descent   | $6.937814076870232\mathrm{e}{-08}$  | $8285$     | $325.49$              | $25.4731895999284500$  |
-| `spa2.mtx` | $1\mathrm{e}{-10}$      | Conjugate Gradient | $5.3242300439609305\mathrm{e}{-09}$ | $240$      | $327.12$              | $0.7618696999270469$   |
-| `vem1.mtx` | $1\mathrm{e}{-4}$       | Jacobi             | $0.0035403807574087$                | $1314$     | $843.51$              | $1.5889921999769283$   |
-| `vem1.mtx` | $1\mathrm{e}{-4}$       | Gauss-Seidel       | $0.0035069725970372$                | $659$      | $125.71$              | $5.2606764000374820$   |
-| `vem1.mtx` | $1\mathrm{e}{-4}$       | Gradient Descent   | $0.0027045724093676$                | $890$      | $1186.92$             | $0.7571939000627026$   |
-| `vem1.mtx` | $1\mathrm{e}{-4}$       | Conjugate Gradient | $4.08279315868558\mathrm{e}{-05}$   | $38$       | $506.84$              | $0.0840924000367522$   |
-| `vem1.mtx` | $1\mathrm{e}{-6}$       | Jacobi             | $3.5400733430273\mathrm{e}{-05}$    | $2433$     | $972.59$              | $2.5296530000632630$   |
-| `vem1.mtx` | $1\mathrm{e}{-6}$       | Gauss-Seidel       | $3.526696849439208\mathrm{e}{-05}$  | $1218$     | $127.23$              | $9.5942181000718850$   |
-| `vem1.mtx` | $1\mathrm{e}{-6}$       | Gradient Descent   | $2.7133391835656718\mathrm{e}{-05}$ | $1612$     | $1275.69$             | $1.2712017999729142$   |
-| `vem1.mtx` | $1\mathrm{e}{-6}$       | Conjugate Gradient | $3.732339701260148\mathrm{e}{-07}$  | $45$       | $1157.63$             | $0.0490893999813124$   |
-| `vem1.mtx` | $1\mathrm{e}{-8}$       | Jacobi             | $3.539765957961423\mathrm{e}{-07}$  | $3552$     | $985.75$              | $3.6336801999714230$   |
-| `vem1.mtx` | $1\mathrm{e}{-8}$       | Gauss-Seidel       | $3.5174569999343266\mathrm{e}{-07}$ | $1778$     | $127.15$              | $14.0072558000683780$  |
-| `vem1.mtx` | $1\mathrm{e}{-8}$       | Gradient Descent   | $2.695337395151536\mathrm{e}{-07}$  | $2336$     | $1189.32$             | $1.9708053000504150$   |
-| `vem1.mtx` | $1\mathrm{e}{-8}$       | Conjugate Gradient | $2.831873377149642\mathrm{e}{-09}$  | $53$       | $1189.46$             | $0.0553522999398410$   |
-| `vem1.mtx` | $1\mathrm{e}{-10}$      | Jacobi             | $3.539458862537178\mathrm{e}{-09}$  | $4671$     | $949.11$              | $4.9504194000037390$   |
-| `vem1.mtx` | $1\mathrm{e}{-10}$      | Gauss-Seidel       | $3.5082426887404104\mathrm{e}{-09}$ | $2338$     | $125.27$              | $18.6864881999790670$  |
-| `vem1.mtx` | $1\mathrm{e}{-10}$      | Gradient Descent   | $2.7131674485379716\mathrm{e}{-09}$ | $3058$     | $1246.84$             | $2.4588767999084660$   |
-| `vem1.mtx` | $1\mathrm{e}{-10}$      | Conjugate Gradient | $2.1917497917575087\mathrm{e}{-11}$ | $59$       | $1149.69$             | $0.0604180999798700$   |
-| `vem2.mtx` | $1\mathrm{e}{-4}$       | Jacobi             | $0.0049684614061871$                | $1927$     | $400.65$              | $4.8665232000639660$   |
-| `vem2.mtx` | $1\mathrm{e}{-4}$       | Gauss-Seidel       | $0.004951189291537$                 | $965$      | $71.99$               | $13.4512047999305630$  |
-| `vem2.mtx` | $1\mathrm{e}{-4}$       | Gradient Descent   | $0.0038119295293834$                | $1308$     | $426.36$              | $3.0824144000653177$   |
-| `vem2.mtx` | $1\mathrm{e}{-4}$       | Conjugate Gradient | $5.729017222223839\mathrm{e}{-05}$  | $47$       | $446.65$              | $0.1250514999264851$   |
-| `vem2.mtx` | $1\mathrm{e}{-6}$       | Jacobi             | $4.967034430530644\mathrm{e}{-05}$  | $3676$     | $417.21$              | $8.8667010000208400$   |
-| `vem2.mtx` | $1\mathrm{e}{-6}$       | Gauss-Seidel       | $4.941761266875986\mathrm{e}{-05}$  | $1840$     | $70.09$               | $26.2978880000300700$  |
-| `vem2.mtx` | $1\mathrm{e}{-6}$       | Gradient Descent   | $3.7914189772545046\mathrm{e}{-05}$ | $2438$     | $437.81$              | $5.5834440001053740$   |
-| `vem2.mtx` | $1\mathrm{e}{-6}$       | Conjugate Gradient | $4.7429962822323085\mathrm{e}{-07}$ | $56$       | $410.44$              | $0.1555539000546559$   |
-| `vem2.mtx` | $1\mathrm{e}{-8}$       | Jacobi             | $4.965607735630084\mathrm{e}{-07}$  | $5425$     | $383.72$              | $14.1968588999006900$  |
-| `vem2.mtx` | $1\mathrm{e}{-8}$       | Gauss-Seidel       | $4.958369542525802\mathrm{e}{-07}$  | $2714$     | $70.35$               | $38.6240653001004800$  |
-| `vem2.mtx` | $1\mathrm{e}{-8}$       | Gradient Descent   | $3.8098505016615633\mathrm{e}{-07}$ | $3566$     | $466.12$              | $7.6654270000290130$   |
-| `vem2.mtx` | $1\mathrm{e}{-8}$       | Conjugate Gradient | $4.2999833377671106\mathrm{e}{-09}$ | $66$       | $454.60$              | $0.1662571999477222$   |
-| `vem2.mtx` | $1\mathrm{e}{-10}$      | Jacobi             | $4.964168598820624\mathrm{e}{-09}$  | $7174$     | $414.10$              | $17.3790523000061500$  |
-| `vem2.mtx` | $1\mathrm{e}{-10}$      | Gauss-Seidel       | $4.948898161655902\mathrm{e}{-09}$  | $3589$     | $70.83$               | $50.7232667000498600$  |
-| `vem2.mtx` | $1\mathrm{e}{-10}$      | Gradient Descent   | $3.7987565270044575\mathrm{e}{-09}$ | $4696$     | $459.04$              | $10.2455003999639300$  |
-| `vem2.mtx` | $1\mathrm{e}{-10}$      | Conjugate Gradient | $2.247621137824687\mathrm{e}{-11}$  | $74$       | $439.76$              | $0.1893309000879526$   |
+| Matrice    | Tolleranza         | Risolutore         | Errore relativo                     | Iterazioni | Iterazioni al secondo | Tempo impiegato (s)   |
+|------------|:------------------:|--------------------|:------------------------------------|-----------:|----------------------:|----------------------:|
+| `spa1.mtx` | $1\mathrm{e}{-4}$  | Jacobi             | $0.0017712811483052$                | $115$      | $3258.60$             | $0.0505786000285297$  |
+| `spa1.mtx` | $1\mathrm{e}{-4}$  | Gauss-Seidel       | $0.0182059429951886$                | $9$        | $195.05$              | $0.0500425000209361$  |
+| `spa1.mtx` | $1\mathrm{e}{-4}$  | Gradient Descent   | $0.0345747007730109$                | $143$      | $3302.22$             | $0.0463016000576317$  |
+| `spa1.mtx` | $1\mathrm{e}{-4}$  | Conjugate Gradient | $0.0207897600099567$                | $49$       | $3204.20$             | $0.0193742000265046$  |
+| `spa1.mtx` | $1\mathrm{e}{-6}$  | Jacobi             | $1.7979295435203664\mathrm{e}{-05}$ | $181$      | $3333.27$             | $0.0709855000022798$  |
+| `spa1.mtx` | $1\mathrm{e}{-6}$  | Gauss-Seidel       | $0.0001299693958593$                | $17$       | $219.13$              | $0.0832920999964699$  |
+| `spa1.mtx` | $1\mathrm{e}{-6}$  | Gradient Descent   | $0.000968045731061$                 | $3577$     | $3035.66$             | $1.1822739000199365$  |
+| `spa1.mtx` | $1\mathrm{e}{-6}$  | Conjugate Gradient | $2.5529092775890695\mathrm{e}{-05}$ | $134$      | $2463.03$             | $0.0589533000020310$  |
+| `spa1.mtx` | $1\mathrm{e}{-8}$  | Jacobi             | $1.824978857450717\mathrm{e}{-07}$  | $247$      | $3074.89$             | $0.0963087000418454$  |
+| `spa1.mtx` | $1\mathrm{e}{-8}$  | Gauss-Seidel       | $1.709732900192307\mathrm{e}{-06}$  | $24$       | $217.01$              | $0.1176029000198468$  |
+| `spa1.mtx` | $1\mathrm{e}{-8}$  | Gradient Descent   | $9.816363743987784\mathrm{e}{-06}$  | $8233$     | $3025.04$             | $2.7249416999984533$  |
+| `spa1.mtx` | $1\mathrm{e}{-8}$  | Conjugate Gradient | $1.3198404441969156\mathrm{e}{-07}$ | $177$      | $2885.35$             | $0.0659314999356865$  |
+| `spa1.mtx` | $1\mathrm{e}{-10}$ | Jacobi             | $1.8524352742197323\mathrm{e}{-09}$ | $313$      | $3056.20$             | $0.1173645000671967$  |
+| `spa1.mtx` | $1\mathrm{e}{-10}$ | Gauss-Seidel       | $2.248087991277066\mathrm{e}{-08}$  | $31$       | $222.37$              | $0.1450276999967172$  |
+| `spa1.mtx` | $1\mathrm{e}{-10}$ | Gradient Descent   | $9.82038624643504\mathrm{e}{-08}$   | $12919$    | $2853.14$             | $4.5308337000897150$  |
+| `spa1.mtx` | $1\mathrm{e}{-10}$ | Conjugate Gradient | $1.2031105079603335\mathrm{e}{-09}$ | $200$      | $2927.66$             | $0.0718103999970480$  |
+| `spa2.mtx` | $1\mathrm{e}{-4}$  | Jacobi             | $0.0017662465191142$                | $36$       | $296.47$              | $0.1938776999013498$  |
+| `spa2.mtx` | $1\mathrm{e}{-4}$  | Gauss-Seidel       | $0.0025988955874525$                | $5$        | $41.67$               | $0.1738186000147834$  |
+| `spa2.mtx` | $1\mathrm{e}{-4}$  | Gradient Descent   | $0.0181296451171122$                | $161$      | $272.11$              | $0.6105576999252662$  |
+| `spa2.mtx` | $1\mathrm{e}{-4}$  | Conjugate Gradient | $0.0098211284572642$                | $42$       | $327.98$              | $0.1609246999723836$  |
+| `spa2.mtx` | $1\mathrm{e}{-6}$  | Jacobi             | $1.6667561367165373\mathrm{e}{-05}$ | $57$       | $302.73$              | $0.2664870000444352$  |
+| `spa2.mtx` | $1\mathrm{e}{-6}$  | Gauss-Seidel       | $5.141641259558678\mathrm{e}{-05}$  | $8$        | $48.31$               | $0.2209601000649854$  |
+| `spa2.mtx` | $1\mathrm{e}{-6}$  | Gradient Descent   | $0.0006694229253854$                | $1949$     | $311.26$              | $6.2817090000025930$  |
+| `spa2.mtx` | $1\mathrm{e}{-6}$  | Conjugate Gradient | $0.0001197984617853$                | $122$      | $315.1$               | $0.4163732000160962$  |
+| `spa2.mtx` | $1\mathrm{e}{-8}$  | Jacobi             | $1.5728698925534617\mathrm{e}{-07}$ | $78$       | $315.70$              | $0.3353824999649077$  |
+| `spa2.mtx` | $1\mathrm{e}{-8}$  | Gauss-Seidel       | $2.7943220320511893\mathrm{e}{-07}$ | $12$       | $50.43$               | $0.2970233999658376$  |
+| `spa2.mtx` | $1\mathrm{e}{-8}$  | Gradient Descent   | $6.86524011651092\mathrm{e}{-06}$   | $5087$     | $324.11$              | $15.7146126999286920$ |
+| `spa2.mtx` | $1\mathrm{e}{-8}$  | Conjugate Gradient | $5.586660602468392\mathrm{e}{-07}$  | $196$      | $333.90$              | $0.6159428999526426$  |
+| `spa2.mtx` | $1\mathrm{e}{-10}$ | Jacobi             | $1.484272806877848\mathrm{e}{-09}$  | $99$       | $307.20$              | $0.4034111999208107$  |
+| `spa2.mtx` | $1\mathrm{e}{-10}$ | Gauss-Seidel       | $5.570739073407751\mathrm{e}{-09}$  | $15$       | $49.51$               | $0.3636420000111684$  |
+| `spa2.mtx` | $1\mathrm{e}{-10}$ | Gradient Descent   | $6.937814076870232\mathrm{e}{-08}$  | $8285$     | $325.49$              | $25.4731895999284500$ |
+| `spa2.mtx` | $1\mathrm{e}{-10}$ | Conjugate Gradient | $5.3242300439609305\mathrm{e}{-09}$ | $240$      | $327.12$              | $0.7618696999270469$  |
+| `vem1.mtx` | $1\mathrm{e}{-4}$  | Jacobi             | $0.0035403807574087$                | $1314$     | $843.51$              | $1.5889921999769283$  |
+| `vem1.mtx` | $1\mathrm{e}{-4}$  | Gauss-Seidel       | $0.0035069725970372$                | $659$      | $125.71$              | $5.2606764000374820$  |
+| `vem1.mtx` | $1\mathrm{e}{-4}$  | Gradient Descent   | $0.0027045724093676$                | $890$      | $1186.92$             | $0.7571939000627026$  |
+| `vem1.mtx` | $1\mathrm{e}{-4}$  | Conjugate Gradient | $4.08279315868558\mathrm{e}{-05}$   | $38$       | $506.84$              | $0.0840924000367522$  |
+| `vem1.mtx` | $1\mathrm{e}{-6}$  | Jacobi             | $3.5400733430273\mathrm{e}{-05}$    | $2433$     | $972.59$              | $2.5296530000632630$  |
+| `vem1.mtx` | $1\mathrm{e}{-6}$  | Gauss-Seidel       | $3.526696849439208\mathrm{e}{-05}$  | $1218$     | $127.23$              | $9.5942181000718850$  |
+| `vem1.mtx` | $1\mathrm{e}{-6}$  | Gradient Descent   | $2.7133391835656718\mathrm{e}{-05}$ | $1612$     | $1275.69$             | $1.2712017999729142$  |
+| `vem1.mtx` | $1\mathrm{e}{-6}$  | Conjugate Gradient | $3.732339701260148\mathrm{e}{-07}$  | $45$       | $1157.63$             | $0.0490893999813124$  |
+| `vem1.mtx` | $1\mathrm{e}{-8}$  | Jacobi             | $3.539765957961423\mathrm{e}{-07}$  | $3552$     | $985.75$              | $3.6336801999714230$  |
+| `vem1.mtx` | $1\mathrm{e}{-8}$  | Gauss-Seidel       | $3.5174569999343266\mathrm{e}{-07}$ | $1778$     | $127.15$              | $14.0072558000683780$ |
+| `vem1.mtx` | $1\mathrm{e}{-8}$  | Gradient Descent   | $2.695337395151536\mathrm{e}{-07}$  | $2336$     | $1189.32$             | $1.9708053000504150$  |
+| `vem1.mtx` | $1\mathrm{e}{-8}$  | Conjugate Gradient | $2.831873377149642\mathrm{e}{-09}$  | $53$       | $1189.46$             | $0.0553522999398410$  |
+| `vem1.mtx` | $1\mathrm{e}{-10}$ | Jacobi             | $3.539458862537178\mathrm{e}{-09}$  | $4671$     | $949.11$              | $4.9504194000037390$  |
+| `vem1.mtx` | $1\mathrm{e}{-10}$ | Gauss-Seidel       | $3.5082426887404104\mathrm{e}{-09}$ | $2338$     | $125.27$              | $18.6864881999790670$ |
+| `vem1.mtx` | $1\mathrm{e}{-10}$ | Gradient Descent   | $2.7131674485379716\mathrm{e}{-09}$ | $3058$     | $1246.84$             | $2.4588767999084660$  |
+| `vem1.mtx` | $1\mathrm{e}{-10}$ | Conjugate Gradient | $2.1917497917575087\mathrm{e}{-11}$ | $59$       | $1149.69$             | $0.0604180999798700$  |
+| `vem2.mtx` | $1\mathrm{e}{-4}$  | Jacobi             | $0.0049684614061871$                | $1927$     | $400.65$              | $4.8665232000639660$  |
+| `vem2.mtx` | $1\mathrm{e}{-4}$  | Gauss-Seidel       | $0.004951189291537$                 | $965$      | $71.99$               | $13.4512047999305630$ |
+| `vem2.mtx` | $1\mathrm{e}{-4}$  | Gradient Descent   | $0.0038119295293834$                | $1308$     | $426.36$              | $3.0824144000653177$  |
+| `vem2.mtx` | $1\mathrm{e}{-4}$  | Conjugate Gradient | $5.729017222223839\mathrm{e}{-05}$  | $47$       | $446.65$              | $0.1250514999264851$  |
+| `vem2.mtx` | $1\mathrm{e}{-6}$  | Jacobi             | $4.967034430530644\mathrm{e}{-05}$  | $3676$     | $417.21$              | $8.8667010000208400$  |
+| `vem2.mtx` | $1\mathrm{e}{-6}$  | Gauss-Seidel       | $4.941761266875986\mathrm{e}{-05}$  | $1840$     | $70.09$               | $26.2978880000300700$ |
+| `vem2.mtx` | $1\mathrm{e}{-6}$  | Gradient Descent   | $3.7914189772545046\mathrm{e}{-05}$ | $2438$     | $437.81$              | $5.5834440001053740$  |
+| `vem2.mtx` | $1\mathrm{e}{-6}$  | Conjugate Gradient | $4.7429962822323085\mathrm{e}{-07}$ | $56$       | $410.44$              | $0.1555539000546559$  |
+| `vem2.mtx` | $1\mathrm{e}{-8}$  | Jacobi             | $4.965607735630084\mathrm{e}{-07}$  | $5425$     | $383.72$              | $14.1968588999006900$ |
+| `vem2.mtx` | $1\mathrm{e}{-8}$  | Gauss-Seidel       | $4.958369542525802\mathrm{e}{-07}$  | $2714$     | $70.35$               | $38.6240653001004800$ |
+| `vem2.mtx` | $1\mathrm{e}{-8}$  | Gradient Descent   | $3.8098505016615633\mathrm{e}{-07}$ | $3566$     | $466.12$              | $7.6654270000290130$  |
+| `vem2.mtx` | $1\mathrm{e}{-8}$  | Conjugate Gradient | $4.2999833377671106\mathrm{e}{-09}$ | $66$       | $454.60$              | $0.1662571999477222$  |
+| `vem2.mtx` | $1\mathrm{e}{-10}$ | Jacobi             | $4.964168598820624\mathrm{e}{-09}$  | $7174$     | $414.10$              | $17.3790523000061500$ |
+| `vem2.mtx` | $1\mathrm{e}{-10}$ | Gauss-Seidel       | $4.948898161655902\mathrm{e}{-09}$  | $3589$     | $70.83$               | $50.7232667000498600$ |
+| `vem2.mtx` | $1\mathrm{e}{-10}$ | Gradient Descent   | $3.7987565270044575\mathrm{e}{-09}$ | $4696$     | $459.04$              | $10.2455003999639300$ |
+| `vem2.mtx` | $1\mathrm{e}{-10}$ | Conjugate Gradient | $2.247621137824687\mathrm{e}{-11}$  | $74$       | $439.76$              | $0.1893309000879526$  |

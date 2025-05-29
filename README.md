@@ -76,12 +76,12 @@ This project provides 4 iterative solvers for Symmetric Positive Definite (SPD) 
 
 ### Jacobi Solver
 
-#### How it updates the guess
+#### How it updates the solution
 
-Split $A$ into its diagonal part $P$ and everything else $N$ so that $A = P − N$.  Because $P$ is diagonal its inverse is just the reciprocals of those diagonal numbers.  
+Split $A$ into its diagonal part $D$ and remainder $R$ so that $A = D − R$. Because $D$ is diagonal its inverse is just the reciprocals of those diagonal numbers.  
 One step is
 
-$x^{k+1} = P^{-1}(N x^{k} + b)$
+$x^{k+1} = D^{-1}(b - R x^{k})$
 
 #### Why/when it converges
 
@@ -98,13 +98,16 @@ One matrix–vector product plus a few vector operations → about $O(n^2)$ oper
 
 #### How it differs from Jacobi
 
-Here $P$ is the lower‑triangular part of $A$ (diagonal included).  
-Instead of forming $P^{-1}$ we solve the triangular system $P y = r$ with forward substitution, then set $x^{k+1}=x^{k}+y$.
+Here $D$ is the lower‑triangular part of $A$ (diagonal included).  
+Instead of forming $D^{-1}$ we solve the triangular system $D y = r$ with forward substitution, then set $x^{k+1}=x^{k}+y$.
+
+**Note**: in our implementation, the code appears to be different from what stated above, but it is **not** just a Jacobi in disguise.  
+It splits $A=D+L+U$ (`np.diag`, `np.tril`, `np.triu`), then performs a forward sweep where each row update (`x[i] = (b[i] - L[i]@x - U[i]@x)/D[i]`) solves the $i$-th equation of $(D+L)\,x^{k+1}=b-Ux^{k}$ using the freshly updated $x^{k+1}_{0…i-1}$ already stored in-place, while the still-old $x^{k}_{i+1…n-1}$ appear in the upper-part product — precisely the lower-triangular forward-substitution Gauss-Seidel requires and unlike Jacobi, which would recompute all entries at once from $x^{k}$.  
+Dividing by the scalar $D_{i}$ avoids forming $D^{-1}$, and for any symmetric positive-definite $A$ this iteration converges, so the loop stops as soon as the residual falls below `tol`.
 
 #### Why/when it converges
 
 The same strict diagonal dominance guarantees convergence.  
-A popular variant called SOR adds a relaxation factor $\omega$; for SPD matrices it converges as long as $0 < \omega < 2$.
 
 #### Work per step
 
@@ -118,7 +121,7 @@ Still dominated by one matrix–vector product, so again $O(n^2)$ for dense $A$,
 
 Solving $A x = b$ is the same as minimising the quadratic
 
-$\varphi(x)=\tfrac12 x^T A x - b^T x$
+$\phi(x)=\tfrac12 x^T A x - b^T x$
 
 With $x^k$ we take the steepest downhill direction $r^k=b – A x^k$ and an exact step length
 
@@ -126,8 +129,8 @@ $\alpha^{k}=\frac{r^{k\,T}r^{k}}{r^{k\,T}A r^{k}}$
 
 #### Why/when it converges
 
-Because $A$ is SPD, $\phi$ is a bowl‑shaped surface with one unique bottom point, so the iterations always reach the solution.  
-The path, however, can *zig‑zag* when $A$’s eigen‑values are far apart.
+Because $A$ is SPD, $\phi$ is a bowl-shaped surface with one unique bottom point, so the iterations always reach the solution.  
+Gradient descent, however, can *zig-zag* on a quadratic $f(x)=\tfrac12x^\top Ax-b^\top x$ when $A$ is ill-conditioned because each gradient $Ax_k$ is dominated by the steep, large-eigenvalue direction, so the step shoots almost perpendicular across the long, flat valley defined by the small eigenvalue; the next gradient then points back the other way, producing an alternating back-and-forth path that creeps only slowly along the valley floor—the worse the eigenvalue ratio $\kappa(A)=\lambda_{\max}/\lambda_{\min}$, the sharper the zig-zag and the slower the convergence.
 
 #### Work per step
 
@@ -137,28 +140,40 @@ One matrix–vector product + a few dot products → $O(n^2)$ for dense $A$.
 
 ### Conjugate Gradient Solver
 
-#### Key idea
+#### How it differs from Gradient Descent
 
 CG keeps the same energy function $\phi$ but chooses each search direction $p^k$ so that it is *A‑conjugate* to all previous ones ($p^{i\,T}A p^{j}=0$ if i≠j).  
-With this choice the exact solution is obtained in at most $n$ steps in exact arithmetic.
-
 A compact version of the update is:
 
-1. $α^k = \frac{r^k·r^k}{p^k·A p^k}$
+1. $α^k = \frac{r^{kT} \cdot r^k}{p^k \cdot A p^k}$
 
-2. $x^{k+1} = x^k + α^kp^k$
+2. $x^{k+1} = x^k+α^kp^k$
 
-3. $r^{k+1} = r^k − α^kA p^k$
+3. $r^{k+1} = r^k−α^kA p^k$
 
-4. $β^k = \frac{r^{k+1}·r^{k+1}}{r^k·r^k}$
+4. $\beta^k = \frac{r^{k+1} \cdot r^{k+1}}{r^{kT} \cdot r^k}$
 
-5. $p^{k+1} = r^{k+1} + β^kp^k$
+5. $p^{k+1} = r^{k+1}+\beta^kp^k$
+
+Gradient Descent always moves *orthogonally* to level sets of $\phi(x)=\tfrac12 x^T A x - b^T x$, so on an elongated quadratic its path keeps *bouncing* across the valley floor: steepest-descent directions at successive points are almost at right angles, giving the already mentioned *zig-zag*.  
+CG replaces these directions by **A-conjugate directions**.  
+Two non-zero vectors $p_i,p_j$ are A-conjugate if $p_i^TA p_j=0$. In the metric induced by $A$ this means they point along **independent principal axes** of the quadratic; once you have minimised along one such axis you will never undo that progress while travelling along another. Hence the path bends only once per axis and quickly beelines to the minimiser.
+
+| step      | formula                                          | geometric / algebraic role                                                                                   |
+| --------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| $α^k$     | $\frac{r^{kT} \cdot r^k}{p^k \cdot A p^k}$       | exact $1D$ minimiser of $\phi$ along $p^k$ (line search)                                                     |
+| $x^{k+1}$ | $x^k+α^kp^k$                                     | new iterate                                                                                                  |
+| $r^{k+1}$ | $r^k−α^kA p^k$                                   | new residual; equal to $−\nabla\phi(x^{k+1})$ and A-orthogonal to $p^k$                                      |
+| $\beta^k$ | $\frac{r^{k+1} \cdot r^{k+1}}{r^{kT} \cdot r^k}$ | scale factor that ensures $p^{k+1}$ is A-conjugate to $p^k$                                                  |
+| $p^{k+1}$ | $r^{k+1}+\beta^kp^k$                             | new search direction that blends fresh gradient info with past direction just enough to maintain A-conjugacy |
+
+The inner-product ratios arise from the algebraic condition $p^{(k+1)T}A p^k = 0$, solved for $\beta^k$ using $r^{k+1} = r^k - \alpha^kA p^k$.
 
 #### Why/when it converges
 
-CG needs $A$ to be SPD.  
-In floating‑point arithmetic it usually reaches machine precision in roughly $\sqrt{κ(A)}$ iterations, far faster than plain Gradient Descent.
+For an $n × n$ SPD matrix $A$, there are surely at least $n$ residuals $\{r^0,…,r^{n-1}\}$. Because each new direction is A-conjugate to all previous ones, these $n$ directions form a basis of $ℝ^n$; after at most $n$ iterations the algorithm has minimised $\phi$ along every independent axis and lands exactly at the unique solution $x$.
+In exact arithmetic this is a proof; in floating point, rounding blurs conjugacy and we need $≈√κ(A)$ iterations, still much faster than plain GD.
 
 #### Work per step
 
-One matrix–vector product plus a fixed number of vector operations, again about $O(n^2)$ for dense $A$ but with many fewer iterations overall.
+One matrix–vector product plus a fixed number of vector operations, again about $O(n^2)$ but with many fewer iterations overall.
