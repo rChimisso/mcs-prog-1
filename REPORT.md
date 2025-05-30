@@ -5,13 +5,14 @@
 ## Indice
 
 1. [Struttura](#struttura)
-    1. [Codice](#codice)
+    1. [Linguaggio](#linguaggio)
+    2. [Codice](#codice)
         1. [`solvers.py`](#solverspy)
         2. [`main.py`](#mainpy)
-    2. [Dati](#dati)
-    3. [Test](#test)
-    4. [Documentazione](#documentazione)
-    5. [CI](#ci)
+    3. [Dati](#dati)
+    4. [Test](#test)
+    5. [Documentazione](#documentazione)
+    6. [CI](#ci)
 2. [Risultati](#risultati)
     1. [Tempo per iterazione](#tempo-per-iterazione)
     2. [Grafici iterazioni impiegate](#grafici-iterazioni-impiegate)
@@ -31,7 +32,12 @@
 
 ### Codice
 
-Il codice sorgente di questa libreria è diviso in due moduli principali: `solver.py` e `main.py`.
+Il codice sorgente di questa libreria è in Python ed è diviso in due moduli principali: `solver.py` e `main.py`.
+
+### Linguaggio
+
+Il linguaggio utilizzato è Python, la cui scelta è stata motivata dalla sua semplicità implementativa, ampia diffusione e supporto esteso da parte della comunità scientifica.  
+In particolare, le numerose librerie scientifiche già disponibili, come NumPy e SciPy, permettono di sfruttare strutture dati efficienti e operazioni matematiche ottimizzate, facilitando notevolmente l'implementazione e la verifica degli algoritmi.
 
 #### `solvers.py`
 
