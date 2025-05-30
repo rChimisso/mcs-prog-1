@@ -30,14 +30,14 @@
 *La struttura di questa libreria è molto semplice e descritta di seguito.*  
 *Una descrizione più dettagliata di ciascun modulo, classe e metodo è sempre disponibile per l'ultima release all'indirizzo https://rchimisso.github.io/mcs-prog-1/.*
 
-### Codice
-
-Il codice sorgente di questa libreria è in Python ed è diviso in due moduli principali: `solver.py` e `main.py`.
-
 ### Linguaggio
 
 Il linguaggio utilizzato è Python, la cui scelta è stata motivata dalla sua semplicità implementativa, ampia diffusione e supporto esteso da parte della comunità scientifica.  
 In particolare, le numerose librerie scientifiche già disponibili, come NumPy e SciPy, permettono di sfruttare strutture dati efficienti e operazioni matematiche ottimizzate, facilitando notevolmente l'implementazione e la verifica degli algoritmi.
+
+### Codice
+
+Il codice sorgente di questa libreria è in Python ed è diviso in due moduli principali: `solver.py` e `main.py`.
 
 #### `solvers.py`
 
