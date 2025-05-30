@@ -9,10 +9,15 @@
     2. [Codice](#codice)
         1. [`solvers.py`](#solverspy)
         2. [`main.py`](#mainpy)
-    3. [Dati](#dati)
-    4. [Test](#test)
-    5. [Documentazione](#documentazione)
-    6. [CI](#ci)
+    3. [Implementazioni](#implementazioni)
+        1. [Jacobi](#jacobi)
+        2. [Gauss-Seidel](#gauss-seidel)
+        3. [Gradient Descent](#gradient-descent)
+        4. [Conjugate Gradient](#conjugate-gradient)
+    4. [Dati](#dati)
+    5. [Test](#test)
+    6. [Documentazione](#documentazione)
+    7. [CI](#ci)
 2. [Risultati](#risultati)
     1. [Tempo per iterazione](#tempo-per-iterazione)
     2. [Grafici iterazioni impiegate](#grafici-iterazioni-impiegate)
@@ -66,9 +71,110 @@ Questo è il modulo principale per l'utilizzo della libreria a linea di comando.
 
 Contiene la logica per il parsing degli argomenti a linea di comando, la lettura di file `.mtx`, l'esecuzione dei diversi risolutori coi parametri specificati e la stampa dei relativi risultati.
 
+### Implementazioni
+
+#### Jacobi
+
+```python
+def _solve(self, A: np.typing.NDArray[np.float64], b: np.typing.NDArray[np.float64], x0: np.typing.NDArray[np.float64], tol: float, max_iter: int) -> tuple[np.typing.NDArray[np.float64], int, bool]:
+  # Punto di partenza per la ricerca della soluzione.
+  x = x0
+  # Estrai la diagonale di A.
+  D = np.diag(A)
+  # Estrai la matrice "remainder" di A.
+  R = A - np.diagflat(D)
+  # Itera al massimo max_iter volte e tieni traccia del progresso.
+  for k in tqdm(range(max_iter), bar_format=bar_format, ncols=80, unit=" iter"):
+    # Aggiorna la soluzione approssimata.
+    x = (b - R @ x) / D
+    # Controlla l'errore residuo e confrontalo con la tolleranza.
+    if self._residual(A, b, x) < tol:
+      return x, k + 1, True
+  return x, max_iter, False
+```
+
+#### Gauss-Seidel
+
+```python
+def _solve(self, A: np.typing.NDArray[np.float64], b: np.typing.NDArray[np.float64], x0: np.typing.NDArray[np.float64], tol: float, max_iter: int) -> tuple[np.typing.NDArray[np.float64], int, bool]:
+  # Punto di partenza per la ricerca della soluzione e sua dimensione.
+  x, n = x0, b.size
+  # Estrai la diagonale di A, il triangolo inferiore e il triangolo superiore.
+  D, L, U = np.diag(A), np.tril(A, -1), np.triu(A,  1)
+  # Itera al massimo max_iter volte e tieni traccia del progresso.
+  for k in tqdm(range(max_iter), bar_format=bar_format, ncols=80, unit=" iter"):
+    # Esegui la forward substitution per aggiornare la soluzione approssimata.
+    for i in range(n):
+      x[i] = (b[i] - L[i] @ x - U[i] @ x) / D[i]
+    # Controlla l'errore residuo e confrontalo con la tolleranza.
+    if self._residual(A, b, x) < tol:
+      return x, k + 1, True
+  return x, max_iter, False
+```
+
+#### Gradient Descent
+
+```python
+def _solve(self, A: np.typing.NDArray[np.float64], b: np.typing.NDArray[np.float64], x0: np.typing.NDArray[np.float64], tol: float, max_iter: int) -> tuple[np.typing.NDArray[np.float64], int, bool]:
+  # Punto di partenza per la ricerca della soluzione e residuo iniziale.
+  x, r = x0, b - A @ x0
+  # Verifica se il residuo iniziale soddisfa già il criterio di arresto.
+  if np.linalg.norm(r) > tol * np.linalg.norm(b):
+    # Itera al massimo max_iter volte e tieni traccia del progresso.
+    for k in tqdm(range(max_iter), bar_format=bar_format, ncols=80, unit=" iter"):
+      # Calcola la direzione del gradiente.
+      Ar = A @ r
+      # Calcola il passo ottimale di discesa (Steepest Descent).
+      alpha = (r @ r) / (r @ Ar)
+      # Aggiorna la soluzione approssimata.
+      x = x + alpha * r
+      # Aggiorna il residuo associato alla nuova soluzione approssimata.
+      r = r - alpha * Ar
+      # Controlla l'errore residuo e confrontalo con la tolleranza.
+      if self._residual(A, b, x) < tol:
+        return x, k + 1, True
+    return x, max_iter, False
+  return x, 0, True
+```
+
+#### Conjugate Gradient
+
+```python
+def _solve(self, A: np.typing.NDArray[np.float64], b: np.typing.NDArray[np.float64], x0: np.typing.NDArray[np.float64], tol: float, max_iter: int) -> tuple[np.typing.NDArray[np.float64], int, bool]:
+  # Punto di partenza per la ricerca della soluzione e residuo iniziale.
+  x, r = x0, b - A @ x0
+  # Direzione coniugata e valore del residuo scalare.
+  p, rs_old = r.copy(), r @ r
+  # Verifica se il residuo iniziale soddisfa già il criterio di arresto.
+  if np.linalg.norm(r) > tol * np.linalg.norm(b):
+    # Itera al massimo max_iter volte e tieni traccia del progresso.
+    for k in tqdm(range(max_iter), bar_format=bar_format, ncols=80, unit=" iter"):
+      # Calcola la direzione coniugata.
+      Ap = A @ p
+      # Coefficiente di spostamento lungo la direzione coniugata.
+      alpha = rs_old / (p @ Ap)
+      # Aggiorna la soluzione approssimata.
+      x = x + alpha * p
+      # Aggiorna il residuo associato alla nuova soluzione approssimata.
+      r = r - alpha * Ap
+      # Controlla l'errore residuo e confrontalo con la tolleranza.
+      if self._residual(A, b, x) < tol:
+        return x, k + 1, True
+      # Aggiorna il residuo scalare.
+      rs_new = r @ r
+      # Coefficiente di ricorrenza per rendere p coniugata rispetto ad A.
+      beta = rs_new / rs_old
+      # Aggiorna la direzione coniugata di spostamento.
+      p = r + beta * p
+      # Aggiorna il vecchio residuo scalare per l'iterazione successiva.
+      rs_old = rs_new
+    return x, max_iter, False
+  return x, 0, True
+```
+
 ### Dati
 
-Sono presenti alcuni file `.mtx` di base come esempio da poter usare per confrontare i diversi risolutori.
+All'interno della cartella [data](./data/) sono presenti alcuni file `.mtx` di base come esempio da poter usare per confrontare i diversi risolutori.
 
 I file il cui nome termina in `x`, escludendo l'estensione, sono file che rappresentano un vettore con ogni componente a $1$ per il relativo file che rappresenta invece una matrice.  
 Ad esempio, il file `spa1.mtx` è una matrice, mentre il file `spa1x.mtx` è il vettore con tutti $1$ associato.  

@@ -182,15 +182,17 @@ class ConjugateGradientSolver(IterativeSolver):
   def _solve(self, A: np.typing.NDArray[np.float64], b: np.typing.NDArray[np.float64], x0: np.typing.NDArray[np.float64], tol: float, max_iter: int) -> tuple[np.typing.NDArray[np.float64], int, bool]:
     x, r = x0, b - A @ x0
     p, rs_old = r.copy(), r @ r
-    for k in tqdm(range(max_iter), bar_format=bar_format, ncols=80, unit=" iter"):
-      Ap = A @ p
-      alpha = rs_old / (p @ Ap)
-      x = x + alpha * p
-      r = r - alpha * Ap
-      if self._residual(A, b, x) < tol:
-        return x, k + 1, True
-      rs_new = r @ r
-      beta = rs_new / rs_old
-      p = r + beta * p
-      rs_old = rs_new
-    return x, max_iter, False
+    if np.linalg.norm(r) > tol * np.linalg.norm(b):
+      for k in tqdm(range(max_iter), bar_format=bar_format, ncols=80, unit=" iter"):
+        Ap = A @ p
+        alpha = rs_old / (p @ Ap)
+        x = x + alpha * p
+        r = r - alpha * Ap
+        if self._residual(A, b, x) < tol:
+          return x, k + 1, True
+        rs_new = r @ r
+        beta = rs_new / rs_old
+        p = r + beta * p
+        rs_old = rs_new
+      return x, max_iter, False
+    return x, 0, True

@@ -103,7 +103,7 @@ Instead of forming $D^{-1}$ we solve the triangular system $D y = r$ with forw
 
 **Note**: in our implementation, the code appears to be different from what stated above, but it is **not** just a Jacobi in disguise.  
 It splits $A=D+L+U$ (`np.diag`, `np.tril`, `np.triu`), then performs a forward sweep where each row update (`x[i] = (b[i] - L[i]@x - U[i]@x)/D[i]`) solves the $i$-th equation of $(D+L)\,x^{k+1}=b-Ux^{k}$ using the freshly updated $x^{k+1}_{0…i-1}$ already stored in-place, while the still-old $x^{k}_{i+1…n-1}$ appear in the upper-part product — precisely the lower-triangular forward-substitution Gauss-Seidel requires and unlike Jacobi, which would recompute all entries at once from $x^{k}$.  
-Dividing by the scalar $D_{i}$ avoids forming $D^{-1}$, and for any symmetric positive-definite $A$ this iteration converges, so the loop stops as soon as the residual falls below `tol`.
+Dividing by the scalar $D_{ii}$ avoids forming $D^{-1}$, and for any symmetric positive-definite $A$ this iteration converges, so the loop stops as soon as the residual falls below `tol`.
 
 #### Why/when it converges
 

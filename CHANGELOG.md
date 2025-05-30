@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Nothing new.
 
+## [v1.0.3] - 2025/05/30
+
+- Added missing check on the initial residual for Conjugate Gradient.
+
 ## [v1.0.2] - 2025/05/29
 
 - Improved documentation.
@@ -37,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 [Unreleased]: https://github.com/rChimisso/mcs-prog-1
 [README]: https://github.com/rChimisso/mcs-prog-1#readme
 
+[v1.0.3]: https://github.com/rChimisso/mcs-prog-1/releases?q=v1.0.3
 [v1.0.2]: https://github.com/rChimisso/mcs-prog-1/releases?q=v1.0.2
 [v1.0.1]: https://github.com/rChimisso/mcs-prog-1/releases?q=v1.0.1
 [v1.0.0]: https://github.com/rChimisso/mcs-prog-1/releases?q=v1.0.0
