@@ -4,15 +4,15 @@ MatIter documentation
 Description
 -----------
 
-| A simple project made for our university course *Metodi del Calcolo Scientifico* that provides iterative solvers for Symmetric Positive Definite (SPD) systems.
-| 
-| This project includes:
-| 
-| - **Documentation**: Extensive Readme, Changelog, and Sphinx-generated codebase docs.
-| - **Report**: A short report with results and analysis.
-| - **Test data**: A few data samples in `Matrix Market format <https://math.nist.gov/MatrixMarket/formats.html>`_.
-| - **CI**: Automatic code analysis and deployment.
-| - **Releases**: Prebuilt `executables <https://github.com/rChimisso/mcs-prog-1/releases>`_ for Linux and Windows.
+A simple project made for our university course *Metodi del Calcolo Scientifico* that provides iterative solvers for Symmetric Positive Definite (SPD) systems.
+
+This project includes:
+
+- **Documentation**: Extensive Readme, Changelog, and Sphinx-generated codebase docs.
+- **Report**: A short report with results and analysis.
+- **Test data**: A few data samples in `Matrix Market format <https://math.nist.gov/MatrixMarket/formats.html>`_.
+- **CI**: Automatic code analysis and deployment.
+- **Releases**: Prebuilt `executables <https://github.com/rChimisso/mcs-prog-1/releases>`_ for Linux and Windows.
 
 Setup
 -----
