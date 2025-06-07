@@ -119,11 +119,11 @@ Still dominated by one matrix–vector product, so again $O(n^2)$ for dense $A$,
 
 #### Geometric picture
 
-Solving $A x = b$ is the same as minimising the quadratic
+Solving $Ax = b$ is the same as minimising the quadratic
 
-$\phi(x)=\tfrac12 x^T A x - b^T x$
+$\phi(x)=\tfrac12 x^T Ax - b^T x$
 
-With $x^k$ we take the steepest downhill direction $r^k=b – A x^k$ and an exact step length
+With $x^k$ we take the steepest downhill direction $r^k=b – Ax^k$ and an exact step length
 
 $\alpha^{k}=\frac{r^{k\,T}r^{k}}{r^{k\,T}A r^{k}}$
 
