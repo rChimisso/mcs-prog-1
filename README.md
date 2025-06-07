@@ -78,7 +78,7 @@ This project provides 4 iterative solvers for Symmetric Positive Definite (SPD) 
 
 #### How it updates the solution
 
-Split $A$ into its diagonal part $D$ and remainder $R$ so that $A = D − R$. Because $D$ is diagonal its inverse is just the reciprocals of those diagonal numbers.  
+Split $A$ into its diagonal part $D$ and remainder $R$ so that $A = D + R$. Because $D$ is diagonal its inverse is just the reciprocals of those diagonal numbers.  
 One step is
 
 $x^{k+1} = D^{-1}(b - R x^{k})$
