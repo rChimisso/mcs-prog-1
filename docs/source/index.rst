@@ -72,7 +72,7 @@ Jacobi Solver
 
 | **How it updates the solution**
 |
-| Split :math:`A` into its diagonal part :math:`D` and remainder :math:`R` so that :math:`A = D - R`. Because :math:`D` is diagonal its inverse is just the reciprocals of those diagonal numbers.
+| Split :math:`A` into its diagonal part :math:`D` and remainder :math:`R` so that :math:`A = D + R`. Because :math:`D` is diagonal its inverse is just the reciprocals of those diagonal numbers.
 | One step is
 
 .. math::
